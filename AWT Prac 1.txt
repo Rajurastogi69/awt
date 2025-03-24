@@ -1,0 +1,200 @@
+Step 1: Install Visual Studio 2022 (if not installed)
+•	Download and install Visual Studio 2022 from Microsoft's website.
+•	During installation, select ASP.NET and web development workload.
+________________________________________
+Step 2: Create a New ASP.NET Core MVC Project
+1.	Open Visual Studio 2022.
+2.	Click on "Create a new project".
+3.	Search for "ASP.NET Core Web App (Model-View-Controller)" and select it.
+4.	Click Next.
+5.	Give your project a name (e.g., OrganizationRegistration).
+6.	Choose a location for the project.
+7.	Click Next.
+8.	Choose: 
+o	.NET 6.0 (LTS) or later.
+o	Keep Authentication Type: None (we will add later).
+o	Click Create.
+________________________________________
+Step 3: Create the Registration Form
+1. Create a Model (Registration.cs)
+•	In Solution Explorer, right-click on the Models folder → Click Add → Class.
+•	Name it Registration.cs and add the following code:
+
+using System.ComponentModel.DataAnnotations;
+
+namespace OrganizationRegistration.Models
+{
+    public class Registration
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required(ErrorMessage = "Full Name is required")]
+        public string FullName { get; set; }
+
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Phone Number is required")]
+        public string PhoneNumber { get; set; }
+
+        [Required(ErrorMessage = "Department is required")]
+        public string Department { get; set; }
+        
+        [Required(ErrorMessage = "Password is required")]
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
+
+        [Compare("Password", ErrorMessage = "Passwords do not match")]
+        [DataType(DataType.Password)]
+        public string ConfirmPassword { get; set; }
+    }
+}
+
+
+2. Create a Database Context
+•	In Solution Explorer, right-click on Models → Add → Class.
+•	Name it ApplicationDbContext.cs and add:
+using Microsoft.EntityFrameworkCore;
+
+namespace OrganizationRegistration.Models
+{
+    public class ApplicationDbContext : DbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
+        public DbSet<Registration> Registrations { get; set; }
+    }
+}
+
+
+
+Step 4: Configure Database (SQL Server)
+1.	Open appsettings.json and modify the connection string:
+
+"ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=OrganizationDB;Trusted_Connection=True;MultipleActiveResultSets=true"
+}
+
+2.	Open Program.cs (or Startup.cs in older versions) and add:
+
+using Microsoft.EntityFrameworkCore;
+using OrganizationRegistration.Models;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+// Add Database Context
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+var app = builder.Build();
+
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();
+
+
+
+Step 5: Add Migrations & Update Database
+1.	Open Tools → NuGet Package Manager → Manage NuGet Packages for Solution.
+2.	Install: 
+1.	Microsoft.EntityFrameworkCore.SqlServer
+2.	Microsoft.EntityFrameworkCore.Tools
+3.	Open Package Manager Console (View > Other Windows > Package Manager Console).
+4.	Run the commands:
+Add-Migration InitialCreate
+Update-Database
+
+
+
+Step 6: Create the Controller
+1.	In Solution Explorer, right-click on the Controllers folder → Add → Controller.
+2.	Select MVC Controller with views, using Entity Framework.
+3.	Choose the Registration Model and ApplicationDbContext.
+4.	Click Add.
+This automatically creates a RegistrationController.cs file.
+
+
+
+Step 7: Modify Registration View
+1.	Open Views/Registration/Create.cshtml.
+2.	Modify the form to include advanced controls:
+
+
+
+@model OrganizationRegistration.Models.Registration
+
+<h2>Registration Form</h2>
+
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="FullName" class="control-label"></label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+    
+    <div class="form-group">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" type="email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PhoneNumber" class="control-label"></label>
+        <input asp-for="PhoneNumber" type="tel" class="form-control" />
+        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Department" class="control-label"></label>
+        <select asp-for="Department" class="form-control">
+            <option value="">Select Department</option>
+            <option value="IT">IT</option>
+            <option value="HR">HR</option>
+            <option value="Finance">Finance</option>
+        </select>
+        <span asp-validation-for="Department" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ConfirmPassword" class="control-label"></label>
+        <input asp-for="ConfirmPassword" type="password" class="form-control" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <br>
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+
+
+
+
+Step 8: Enable Client-Side Validation
+1.	Open _Layout.cshtml.
+2.	Add the following inside <head>:
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+
+
+
+
+
+
+Step 9: Run the Application
+•	Click Start (IIS Express).
+•	Navigate to /Registration/Create to fill out the form.

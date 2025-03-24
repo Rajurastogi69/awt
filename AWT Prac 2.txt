@@ -1,0 +1,123 @@
+Step 1: Create a New ASP.NET Web Forms Project
+1.	Open Visual Studio 2022.
+2.	Click "Create a new project".
+3.	Search for "ASP.NET Web Application (.NET Framework)" and select it.
+4.	Click Next.
+5.	Give your project a name (e.g., MasterPageWebsite).
+6.	Choose a location and click Next.
+7.	Select Web Forms as the template.
+8.	Click Create.
+
+
+Step 2: Add a Master Page
+1.	In Solution Explorer, right-click on the Project Name → Click Add → New Item.
+2.	Select "Master Page" from the list.
+3.	Name it Site.master.
+4.	Click Add.
+5.	Modify the Site.master file:
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <title>My Website</title>
+    <link rel="stylesheet" href="Styles.css" />
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome to My Website</h1>
+        <nav>
+            <a href="Home.aspx">Home</a> |
+            <a href="About.aspx">About</a> |
+            <a href="Contact.aspx">Contact</a>
+        </nav>
+    </div>
+    <div class="content">
+        <asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
+    </div>
+    <div class="footer">
+        <p>&copy; 2025 My Website. All rights reserved.</p>
+    </div>
+</body>
+</html>
+
+
+
+Step 3: Create a Content Page (Home Page)
+1.	Right-click the project → Click Add → New Web Form with Master Page.
+2.	Name it Home.aspx.
+3.	Select Site.master as the master page.
+4.	Modify Home.aspx:
+
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <h2>Home Page</h2>
+    <p>Welcome to the home page of our website!</p>
+</asp:Content>
+
+
+
+Step 4: Add More Pages (About & Contact)
+1.	Repeat the steps for About.aspx and Contact.aspx, linking them to Site.master.
+
+About.aspx
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <h2>About Us</h2>
+    <p>We are a tech company providing innovative solutions.</p>
+</asp:Content>
+
+Contact.aspx
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <h2>Contact Us</h2>
+    <p>Email: contact@mywebsite.com</p>
+</asp:Content>
+
+
+Step 5: Style the Website
+1.	Add a CSS file: 
+1.	Right-click Project → Add → New Item → Style Sheet.
+2.	Name it Styles.css.
+3.	Modify Styles.css:
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+}
+
+.content {
+    padding: 20px;
+}
+
+.footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+
+
+Step 6: Run the Website
+1.	Click the Start (IIS Express) button.
+2.	Navigate between Home, About, and Contact using the navigation bar.
+
+
+
